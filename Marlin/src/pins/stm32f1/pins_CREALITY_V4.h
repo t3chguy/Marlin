@@ -198,3 +198,11 @@
   #define BEEPER_PIN                        PA5
 
 #endif
+
+#if HAS_TMC_UART
+
+  #define E0_SERIAL_TX_PIN PA3
+  #define E0_SERIAL_RX_PIN PA3
+  #define TMC_BAUD_RATE    19200
+
+#endif
