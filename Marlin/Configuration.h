@@ -494,9 +494,9 @@
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
   #else
     // Ender 3 v2
-    #define DEFAULT_Kp  29.62
-    #define DEFAULT_Ki   2.89
-    #define DEFAULT_Kd  75.98
+    #define DEFAULT_Kp  31.78
+    #define DEFAULT_Ki   3.17
+    #define DEFAULT_Kd  79.60
   #endif
 #endif // PIDTEMP
 
@@ -533,10 +533,11 @@
   //#define MIN_BED_POWER 0
   //#define PID_BED_DEBUG // Sends debug data to the serial port.
 
+
   // Ender 3 V2
-  #define DEFAULT_bedKp 247.24
-  #define DEFAULT_bedKi  40.39
-  #define DEFAULT_bedKd 708.83
+  #define DEFAULT_bedKp 162.04
+  #define DEFAULT_bedKi  30.63
+  #define DEFAULT_bedKd 571.47
 
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
@@ -993,7 +994,7 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { -38.5, +6, 0 }
+#define NOZZLE_TO_PROBE_OFFSET { 0, -56, 0 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
