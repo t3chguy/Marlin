@@ -2032,7 +2032,10 @@ inline void Popup_Control() {
             thermalManager.disable_all_heaters();
             Draw_Print_Screen();
           } else {
-            // TODO: Local Pause During Host Print
+            #if ENABLED(HOST_ACTION_COMMANDS)
+              host_action_pause();
+              Draw_Print_Screen();
+            #endif
           }
         } else {
           Draw_Print_Screen();
@@ -2041,12 +2044,14 @@ inline void Popup_Control() {
       case Stop:
         if (selection==0) {
           if (sdprint) {
-          card.flag.abort_sd_printing = true; 
-          thermalManager.zero_fan_speeds();
-          thermalManager.disable_all_heaters();
-          Draw_Main_Menu();
+            card.flag.abort_sd_printing = true;
+            thermalManager.zero_fan_speeds();
+            thermalManager.disable_all_heaters();
+            Draw_Main_Menu();
           } else {
-            // TODO: Local Stop During Host Print
+            #if ENABLED(HOST_ACTION_COMMANDS)
+              host_action_cancel();
+            #endif
           }
         } else {
           Draw_Print_Screen();
@@ -2054,11 +2059,15 @@ inline void Popup_Control() {
         break;
       case Resume:
         if (selection==0) {
-          queue.inject_P(PSTR("M1000"));
-          Draw_Print_Screen();
-        } else {
-          Draw_Print_Screen();
+          if (sdprint) {
+            queue.inject_P(PSTR("M1000"));
+          } else {
+            #if ENABLED(HOST_ACTION_COMMANDS)
+              host_action_resume();
+            #endif
+          }
         }
+        Draw_Print_Screen();
         break;
       case ETemp:
         if (selection==0) {
