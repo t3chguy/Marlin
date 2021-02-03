@@ -633,7 +633,11 @@ int Get_Menu_Size(uint8_t menu) {
     case ManualMesh:
       return 4;
     case Tune:
-      return 8;
+      #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
+        return 9;
+      #else
+        return 8;
+      #endif
   }
   return 0;
 }
@@ -709,7 +713,11 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
         #if ENABLED(ADVANCED_PAUSE_FEATURE)
           case 8: // Change Filament
             if (draw) {
-              Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament", true);
+              #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
+                Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament", true);
+              #else
+                Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament");
+              #endif
             } else {
               #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
                 Draw_Menu(ChangeFilament);
@@ -992,7 +1000,7 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
             break;
           case 1: // Load Filament
             if (draw) {
-              Draw_Menu_Item(row, ICON_WriteEEPROM, (char*)"Load Filament", true);
+              Draw_Menu_Item(row, ICON_WriteEEPROM, (char*)"Load Filament");
             } else {
               Popup_Window_LoadFilament();
               gcode.process_subcommands_now_P(PSTR("M701"));
@@ -1002,7 +1010,7 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
             break;
           case 2: // Unload Filament
             if (draw) {
-              Draw_Menu_Item(row, ICON_ReadEEPROM, (char*)"Unload Filament", true);
+              Draw_Menu_Item(row, ICON_ReadEEPROM, (char*)"Unload Filament");
             } else {
               Popup_Window_LoadFilament(true);
               gcode.process_subcommands_now_P(PSTR("M702"));
@@ -1012,7 +1020,7 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
             break;
           case 3: // Change Filament
             if (draw) {
-              Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament", true);
+              Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament");
             } else {
               Popup_Window_ChangeFilament();
               gcode.process_subcommands_now_P(PSTR("M600 B1"));
@@ -1712,6 +1720,18 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
             }
           }
           break;
+        #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
+          case 9: // Change Filament
+            if (draw) {
+              Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament");
+            } else {
+              Popup_Window_ChangeFilament();
+              gcode.process_subcommands_now_P(PSTR("M600 B1"));
+              planner.synchronize();
+              Draw_Print_Screen();
+            }
+            break;
+          #endif
       }
       break;
   }
