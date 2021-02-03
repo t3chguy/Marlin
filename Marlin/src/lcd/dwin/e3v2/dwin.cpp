@@ -54,6 +54,10 @@
 
 #if ENABLED(DWIN_CREALITY_LCD)
 
+#if ENABLED(ADVANCED_PAUSE_FEATURE)
+  #include "../../../feature/pause.h"
+#endif
+
 #if ENABLED(HOST_ACTION_COMMANDS)
   #include "../../../feature/host_actions.h"
 #endif
@@ -2176,6 +2180,9 @@ inline void Popup_Control() {
           Draw_Main_Menu();
         }
         break;
+      case M600:
+        Draw_Menu(Prepare, 8);
+        break;
     }
   DWIN_UpdateLCD();
 }
@@ -2187,9 +2194,6 @@ inline void Confirm_Control() {
     switch(popup) {
       case Complete:
         Draw_Main_Menu();
-        break;
-      case M600:
-        Draw_Menu(Prepare, 8);
         break;
     }
   }
@@ -2418,12 +2422,10 @@ inline void HMI_SDCardInit() { card.cdroot(); }
 void MarlinUI::refresh() {}
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
-  #include "../../../feature/pause.h"
-
   void MarlinUI::pause_show_message(const PauseMessage message, const PauseMode mode, const uint8_t extruder) {
     // TODO implement remainder of PauseMessage states
     if (message == PAUSE_MESSAGE_INSERT || message == PAUSE_MESSAGE_WAITING) {
-      process = Confirm;
+      process = Popup;
       popup = M600;
       Clear_Screen();
 
