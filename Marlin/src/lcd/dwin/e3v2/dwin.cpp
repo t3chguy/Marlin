@@ -793,7 +793,7 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
             Draw_Menu_Item(row, ICON_Axis, (char*)"Bottom Left");
           } else {
             Popup_Window_Move();
-            gcode.process_subcommands_now_P(PSTR("G1 F4000\nG1 Z10\nG1 X20 Y20\nG1 F300 Z0\nM220 S100"));
+            gcode.process_subcommands_now_P(PSTR("G1 F4000\nG1 Z10\nG1 X30 Y30\nG1 F300 Z0\nM220 S100"));
             planner.synchronize();
             Draw_Menu(ManualLevel, 1);
           }
@@ -803,7 +803,7 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
             Draw_Menu_Item(row, ICON_Axis, (char*)"Top Left");
           } else {
             Popup_Window_Move();
-            gcode.process_subcommands_now_P(PSTR("G1 F4000\nG1 Z10\nG1 X20 Y215\nG1 F300 Z0\nM220 S100"));
+            gcode.process_subcommands_now_P(PSTR("G1 F4000\nG1 Z10\nG1 X30 Y205\nG1 F300 Z0\nM220 S100"));
             planner.synchronize();
             Draw_Menu(ManualLevel, 2);
           }
@@ -813,7 +813,7 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
             Draw_Menu_Item(row, ICON_Axis, (char*)"Top Right");
           } else {
             Popup_Window_Move();
-            gcode.process_subcommands_now_P(PSTR("G1 F4000\nG1 Z10\nG1 X215 Y215\nG1 F300 Z0\nM220 S100"));
+            gcode.process_subcommands_now_P(PSTR("G1 F4000\nG1 Z10\nG1 X205 Y205\nG1 F300 Z0\nM220 S100"));
             planner.synchronize();
             Draw_Menu(ManualLevel, 3);
           }
@@ -823,7 +823,7 @@ void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/*=true*/) {
             Draw_Menu_Item(row, ICON_Axis, (char*)"Bottom Right");
           } else {
             Popup_Window_Move();
-            gcode.process_subcommands_now_P(PSTR("G1 F4000\nG1 Z10\nG1 X215 Y20\nG1 F300 Z0\nM220 S100"));
+            gcode.process_subcommands_now_P(PSTR("G1 F4000\nG1 Z10\nG1 X205 Y30\nG1 F300 Z0\nM220 S100"));
             planner.synchronize();
             Draw_Menu(ManualLevel, 4);
           }
@@ -1856,9 +1856,9 @@ void Popup_window_SaveLevel() {
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   void Popup_Window_ChangeFilament() {
-    process = Popup;
+    process = Wait;
     Clear_Screen();
-    DWIN_Draw_Rectangle(1, Color_Bg_Window, 14, 60, 258, 360);
+    DWIN_Draw_Rectangle(1, Color_Bg_Window, 14, 60, 258, 350);
     DWIN_ICON_Show(ICON, ICON_BLTouch, 101, 105);
     DWIN_Draw_String(false, true, font8x16, Popup_Text_Color, Color_Bg_Window, (272 - 8 * 15) / 2, 230, (char*)"Filament Change");
     DWIN_Draw_String(false, true, font8x16, Popup_Text_Color, Color_Bg_Window, (272 - 8 * 26) / 2, 260, (char*)"Please wait while heating.");
@@ -1866,9 +1866,9 @@ void Popup_window_SaveLevel() {
 
   #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
     void Popup_Window_LoadFilament(const bool unloading/*=false*/) {
-      process = Popup;
+      process = Wait;
       Clear_Screen();
-      DWIN_Draw_Rectangle(1, Color_Bg_Window, 14, 60, 258, 360);
+      DWIN_Draw_Rectangle(1, Color_Bg_Window, 14, 60, 258, 350);
       DWIN_ICON_Show(ICON, ICON_BLTouch, 101, 105);
       DWIN_Draw_String(false, true, font8x16, Popup_Text_Color, Color_Bg_Window, (272 - 8 * (unloading ? 18 : 16)) / 2, 230, unloading ? (char*)"Unloading Filament" : (char*)"Loading Filament");
       DWIN_Draw_String(false, true, font8x16, Popup_Text_Color, Color_Bg_Window, (272 - 8 * 23) / 2, 260, (char*)"Please wait until done.");
@@ -1892,6 +1892,7 @@ inline void Main_Menu_Control() {
   else if (encoder_diffState == ENCODER_DIFF_ENTER)
     switch(selection) {
       case 0:
+        card.mount();
         Draw_SD_List();
         break;
       case 1:
@@ -2215,6 +2216,9 @@ inline void Confirm_Control() {
       case Complete:
         Draw_Main_Menu();
         break;
+      case M600:
+        Draw_Menu(Prepare, 8);
+        break;
     }
   }
   DWIN_UpdateLCD();
@@ -2445,11 +2449,11 @@ void MarlinUI::refresh() {}
   void MarlinUI::pause_show_message(const PauseMessage message, const PauseMode mode, const uint8_t extruder) {
     // TODO implement remainder of PauseMessage states
     if (message == PAUSE_MESSAGE_INSERT || message == PAUSE_MESSAGE_WAITING) {
-      process = Popup;
+      process = Confirm;
       popup = M600;
       Clear_Screen();
 
-      DWIN_Draw_Rectangle(1, Color_Bg_Window, 14, 60, 258, 360);
+      DWIN_Draw_Rectangle(1, Color_Bg_Window, 14, 60, 258, 350);
       DWIN_ICON_Show(ICON, ICON_BLTouch, 101, 105);
       DWIN_Draw_String(false, true, font8x16, Popup_Text_Color, Color_Bg_Window, (272 - 8 * (message == PAUSE_MESSAGE_INSERT ? 15 : 6)) / 2, 230, message == PAUSE_MESSAGE_INSERT ? (char*)"Filament Change" : (char*)"Paused");
       DWIN_Draw_String(false, true, font8x16, Popup_Text_Color, Color_Bg_Window, (272 - 8 * (message == PAUSE_MESSAGE_INSERT ? 15 : 21 )) / 2, 260, message == PAUSE_MESSAGE_INSERT ? (char*)"Insert Filament" : (char*)"Press to resume print");
