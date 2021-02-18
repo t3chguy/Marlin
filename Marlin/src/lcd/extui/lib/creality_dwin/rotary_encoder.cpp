@@ -28,18 +28,18 @@
  * @brief    Rotary encoder functions
  *****************************************************************************/
 
-#include "../../../inc/MarlinConfigPre.h"
+#include "../../inc/MarlinConfigPre.h"
 
-#if ENABLED(DWIN_CREALITY_LCD)
+#if ENABLED(CREALITY_DWIN_EXTUI)
 
 #include "rotary_encoder.h"
-#include "../../buttons.h"
+#include "../../../buttons.h"
 
-#include "../../../MarlinCore.h"
-#include "../../../HAL/shared/Delay.h"
+#include "../../MarlinCore.h"
+#include "../../HAL/shared/Delay.h"
 
 #if HAS_BUZZER
-  #include "../../../libs/buzzer.h"
+  #include "../../libs/buzzer.h"
 #endif
 
 #include <stdlib.h>

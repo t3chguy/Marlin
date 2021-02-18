@@ -23,20 +23,20 @@
 
 /**
  * DWIN by Creality3D
- * Rewrite by Jacob Myers
+ * Rewrite and Extui Port by Jacob Myers
  */
 
-#include "../dwin_lcd.h"
+#include "dwin.h"
 #include "rotary_encoder.h"
-#include "../../../libs/BL24CXX.h"
-#include "../../../inc/MarlinConfigPre.h"
+#include "../../libs/BL24CXX.h"
+#include "../../inc/MarlinConfigPre.h"
 
 enum processID : uint8_t {
   Main, Print, Menu, Value, File, Popup, Confirm, Wait
 };
 
 enum popupID : uint8_t {
-  Pause, Stop, Resume, SaveLevel, ETemp, Level, Home, MoveWait, Complete, M600, FilLoad, FilChange
+  Pause, Stop, Resume, SaveLevel, ETemp, Level, Home, MoveWait, Complete, FilLoad, FilChange, UI, TempWarn
 };
 
 enum menuID : uint8_t {
@@ -53,6 +53,7 @@ enum menuID : uint8_t {
         Preheat2,
         Preheat3,
         Preheat4,
+        Preheat5,
       Motion,
         MaxSpeed,
         MaxAcceleration,
@@ -195,65 +196,68 @@ enum menuID : uint8_t {
 
 extern millis_t dwin_heat_time;
 
-inline void Clear_Screen(uint8_t e=3);
-inline void Draw_Float(float value, uint8_t row, bool selected=false, uint8_t minunit=10);
-inline void Draw_Title(char* title);
-inline void Draw_Menu_Item(uint8_t row, uint8_t icon=0, char * const label=(char*)"", bool more=false);
-inline void Draw_Menu(uint8_t menu, uint8_t select=0, uint8_t scroll=0);
+class CrealityDWINClass {
+
+public:
+
+  inline void Clear_Screen(uint8_t e=3);
+  inline void Draw_Float(float value, uint8_t row, bool selected=false, uint8_t minunit=10);
+  inline void Draw_Title(char* title);
+  inline void Draw_Menu_Item(uint8_t row, uint8_t icon=0, char * const label=(char*)"", bool more=false);
+  inline void Draw_Menu(uint8_t menu, uint8_t select=0, uint8_t scroll=0);
 
 
-void Main_Menu_Icons();
-void Draw_Main_Menu(uint8_t select=0);
-void Print_Screen_Icons();
-void Draw_Print_Screen();
-void Draw_Print_ProgressBar();
-void Draw_Print_ProgressRemain();
-void Draw_Print_ProgressElapsed();
-void Draw_Print_confirm();
-void Draw_SD_Item(uint8_t item, uint8_t row);
-void Draw_SD_List(bool removed=false);
-void Draw_Status_Area(const bool with_update);
-void Update_Status_Area();
-void Draw_Popup(char *line1, char *line2, char *line3, uint8_t mode, uint8_t icon=0);
+  void Main_Menu_Icons();
+  void Draw_Main_Menu(uint8_t select=0);
+  void Print_Screen_Icons();
+  void Draw_Print_Screen();
+  void Draw_Print_ProgressBar();
+  void Draw_Print_ProgressRemain();
+  void Draw_Print_ProgressElapsed();
+  void Draw_Print_confirm();
+  void Draw_SD_Item(uint8_t item, uint8_t row);
+  void Draw_SD_List(bool removed=false);
+  void Draw_Status_Area(bool icons=false);
+  void Draw_Popup(const char *line1, const char *line2, const char *line3, uint8_t mode, uint8_t icon=0);
+  void Popup_Select();
+  void Update_Status_Bar();
 
 
-char* Get_Menu_Title(uint8_t menu);
-int Get_Menu_Size(uint8_t menu);
-void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw=true);
+  char* Get_Menu_Title(uint8_t menu);
+  int Get_Menu_Size(uint8_t menu);
+  void Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw=true);
 
 
-void Popup_Select();
-void Popup_Handler(uint8_t popupid, bool option = false);
-void DWIN_Popup_Temperature(const bool toohigh);
+  void Popup_Handler(uint8_t popupid, bool option = false);
+  void Confirm_Handler(const char * const msg);
 
 
-inline void Main_Menu_Control();
-inline void Menu_Control();
-inline void Value_Control();
-inline void File_Control();
-inline void Print_Screen_Control();
-inline void Popup_Control();
-inline void Confirm_Control();
+  inline void Main_Menu_Control();
+  inline void Menu_Control();
+  inline void Value_Control();
+  inline void File_Control();
+  inline void Print_Screen_Control();
+  inline void Popup_Control();
+  inline void Confirm_Control();
 
 
-void Setup_Value(float value, float min, float max, float unit, uint8_t type);
-void Modify_Value(float &value, float min, float max, float unit);
-void Modify_Value(uint8_t &value, float min, float max, float unit);
-void Modify_Value(uint16_t &value, float min, float max, float unit);
-void Modify_Value(int16_t &value, float min, float max, float unit);
-void Modify_Value(uint32_t &value, float min, float max, float unit);
+  void Setup_Value(float value, float min, float max, float unit, uint8_t type);
+  void Modify_Value(float &value, float min, float max, float unit);
+  void Modify_Value(uint8_t &value, float min, float max, float unit);
+  void Modify_Value(uint16_t &value, float min, float max, float unit);
+  void Modify_Value(int16_t &value, float min, float max, float unit);
+  void Modify_Value(uint32_t &value, float min, float max, float unit);
 
 
-void Host_Print_Update(uint8_t percent, uint32_t remaining);
-void Host_Print_Text(char * const text);
+  void Update_Status(const char * const text);
+  void Start_Print(bool sd);
+  void Stop_Print();
+  void Update();
+  void Screen_Update();
+  void Startup();
+  void AudioFeedback(const bool success=true);
+  void SDCardInsert();
 
+};
 
-void Start_Print(bool sd);
-void Stop_Print();
-void DWIN_Update();
-void Variable_Update();
-void Screen_Update();
-void HMI_Init();
-void HMI_StartFrame(const bool with_update);
-void AudioFeedback(const bool success=true);
-inline void HMI_SDCardInit();
+extern CrealityDWINClass CrealityDWIN;
