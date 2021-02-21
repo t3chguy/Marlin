@@ -1896,7 +1896,9 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
       #define ADVANCED_BACK 0
       #define ADVANCED_XOFFSET (ADVANCED_BACK + ENABLED(HAS_BED_PROBE))
       #define ADVANCED_YOFFSET (ADVANCED_XOFFSET + ENABLED(HAS_BED_PROBE))
-      #define ADVANCED_TOTAL ADVANCED_YOFFSET
+      #define ADVANCED_FILSENSORENABLED (ADVANCED_YOFFSET + ENABLED(FILAMENT_RUNOUT_SENSOR))
+      #define ADVANCED_FILSENSORDISTANCE (ADVANCED_FILSENSORENABLED + ENABLED(FILAMENT_RUNOUT_SENSOR))
+      #define ADVANCED_TOTAL ADVANCED_FILSENSORDISTANCE
 
       switch (item) {
         case ADVANCED_BACK:
@@ -1924,6 +1926,32 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           }
           else {
             Modify_Value(probe.offset.y, -50, 50, 10);
+          }
+          break;
+        #endif
+        #if ENABLED(FILAMENT_RUNOUT_SENSOR)
+        case ADVANCED_FILSENSORENABLED:
+          if (draw) {
+            if (ExtUI::getFilamentRunoutEnabled()) {
+              Draw_Menu_Item(row, ICON_Extruder, (char*)"Disable Filament Sensor");
+            }
+            else {
+              Draw_Menu_Item(row, ICON_Extruder, (char*)"Enable Filament Sensor");
+            }
+          }
+          else {
+            ExtUI::setFilamentRunoutEnabled(!ExtUI::getFilamentRunoutEnabled());
+            Draw_Menu(Advanced, ADVANCED_FILSENSORENABLED);
+          }
+          break;
+        case ADVANCED_FILSENSORDISTANCE:
+          float distance = ExtUI::getFilamentRunoutDistance_mm();
+          if (draw) {
+            Draw_Menu_Item(row, ICON_MaxAccE, (char*)"Runout Distance");
+            Draw_Float(distance, row, false, 10);
+          }
+          else {
+            Setup_Value(distance, 0, 999, 10, 5);
           }
           break;
         #endif
@@ -2062,7 +2090,8 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
       #define TUNE_ZUP (TUNE_ZOFFSET + ENABLED(HAS_ZOFFSET_ITEM))
       #define TUNE_ZDOWN (TUNE_ZUP + ENABLED(HAS_ZOFFSET_ITEM))
       #define TUNE_CHANGEFIL (TUNE_ZDOWN + ENABLED(FILAMENT_LOAD_UNLOAD_GCODES))
-      #define TUNE_TOTAL TUNE_CHANGEFIL
+      #define TUNE_FILSENSORENABLED (TUNE_CHANGEFIL + ENABLED(FILAMENT_RUNOUT_SENSOR))
+      #define TUNE_TOTAL TUNE_FILSENSORENABLED
 
       switch (item) {
         case TUNE_BACK:
@@ -2170,6 +2199,22 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             gcode.process_subcommands_now_P(PSTR("M600 B1"));
             planner.synchronize();
             Draw_Menu(Tune, TUNE_CHANGEFIL);
+          }
+          break;
+        #endif
+        #if ENABLED(FILAMENT_RUNOUT_SENSOR)
+        case TUNE_FILSENSORENABLED:
+          if (draw) {
+            if (ExtUI::getFilamentRunoutEnabled()) {
+              Draw_Menu_Item(row, ICON_Extruder, (char*)"Disable Filament Sensor");
+            }
+            else {
+              Draw_Menu_Item(row, ICON_Extruder, (char*)"Enable Filament Sensor");
+            }
+          }
+          else {
+            ExtUI::setFilamentRunoutEnabled(!ExtUI::getFilamentRunoutEnabled());
+            Draw_Menu(Tune, TUNE_FILSENSORENABLED);
           }
           break;
         #endif
@@ -2488,6 +2533,7 @@ inline void CrealityDWINClass::Value_Control() {
       case 2: *(uint16_t*)valuepointer = tempvalue/valueunit; break;
       case 3: *(int16_t*)valuepointer = tempvalue/valueunit; break;
       case 4: *(uint32_t*)valuepointer = tempvalue/valueunit; break;
+      case 5: ExtUI::setFilamentRunoutDistance_mm(tempvalue/valueunit); break;
     }
     process = Menu;
     EncoderRate.enabled = false;
