@@ -2533,7 +2533,9 @@ inline void CrealityDWINClass::Value_Control() {
       case 2: *(uint16_t*)valuepointer = tempvalue/valueunit; break;
       case 3: *(int16_t*)valuepointer = tempvalue/valueunit; break;
       case 4: *(uint32_t*)valuepointer = tempvalue/valueunit; break;
-      case 5: ExtUI::setFilamentRunoutDistance_mm(tempvalue/valueunit); break;
+      #if ENABLED(FILAMENT_RUNOUT_SENSOR)
+        case 5: ExtUI::setFilamentRunoutDistance_mm(tempvalue/valueunit); break;
+      #endif
     }
     process = Menu;
     EncoderRate.enabled = false;
